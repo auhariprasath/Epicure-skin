@@ -46,43 +46,14 @@ export const submitPrediction = (data: {
 // Endpoint: GET /api/predictions
 // Request: {}
 // Response: { predictions: Array<{ _id: string, disease: string, confidence: number, timestamp: string, imageUrl: string }> }
-export const getPredictionHistory = () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        predictions: [
-          {
-            _id: 'pred_1',
-            disease: 'Melanoma',
-            confidence: 87,
-            timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-            imageUrl: 'https://api.dicebear.com/7.x/shapes/svg?seed=pred1'
-          },
-          {
-            _id: 'pred_2',
-            disease: 'Psoriasis',
-            confidence: 72,
-            timestamp: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
-            imageUrl: 'https://api.dicebear.com/7.x/shapes/svg?seed=pred2'
-          },
-          {
-            _id: 'pred_3',
-            disease: 'Eczema',
-            confidence: 65,
-            timestamp: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-            imageUrl: 'https://api.dicebear.com/7.x/shapes/svg?seed=pred3'
-          }
-        ]
-      });
-    }, 500);
-  });
-
-  // Uncomment to make actual API call
-  // try {
-  //   return await api.get('/api/predictions');
-  // } catch (error) {
-  //   throw new Error(error?.response?.data?.message || error.message);
-  // }
+export const getPredictionHistory = async () => {
+  try {
+    const response = await api.get('/api/auth/predictions');
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching predictions:', error);
+    throw new Error(error?.response?.data?.message || error.message);
+  }
 };
 
 // Description: Get single prediction details

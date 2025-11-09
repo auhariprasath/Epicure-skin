@@ -4,66 +4,14 @@ import api from './api';
 // Endpoint: GET /api/doctors
 // Request: {}
 // Response: { doctors: Array<{ _id: string, name: string, specialization: string, bio: string, qualifications: string[], responseTime: string, isAvailable: boolean, avatar: string, rating: number }> }
-export const getDoctors = () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        doctors: [
-          {
-            _id: 'doc_1',
-            name: 'Dr. Sarah Johnson',
-            specialization: 'Dermatology',
-            bio: 'Board-certified dermatologist with 15 years of experience in skin cancer diagnosis and treatment.',
-            qualifications: ['MD', 'Board Certified Dermatologist', 'Fellowship in Mohs Surgery'],
-            responseTime: '2-4 hours',
-            isAvailable: true,
-            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
-            rating: 4.8
-          },
-          {
-            _id: 'doc_2',
-            name: 'Dr. Michael Chen',
-            specialization: 'Dermatology & Cosmetic',
-            bio: 'Specialist in both medical and cosmetic dermatology with expertise in skin conditions.',
-            qualifications: ['MD', 'Board Certified Dermatologist', 'Cosmetic Surgery Certification'],
-            responseTime: '4-6 hours',
-            isAvailable: true,
-            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michael',
-            rating: 4.6
-          },
-          {
-            _id: 'doc_3',
-            name: 'Dr. Emily Rodriguez',
-            specialization: 'Pediatric Dermatology',
-            bio: 'Specialized in treating skin conditions in children and adolescents.',
-            qualifications: ['MD', 'Board Certified Dermatologist', 'Pediatric Dermatology Fellowship'],
-            responseTime: '1-3 hours',
-            isAvailable: false,
-            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emily',
-            rating: 4.9
-          },
-          {
-            _id: 'doc_4',
-            name: 'Dr. James Wilson',
-            specialization: 'Dermatology',
-            bio: 'Expert in treating complex skin conditions and autoimmune skin disorders.',
-            qualifications: ['MD', 'Board Certified Dermatologist', 'Research Fellowship'],
-            responseTime: '3-5 hours',
-            isAvailable: true,
-            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=James',
-            rating: 4.7
-          }
-        ]
-      });
-    }, 500);
-  });
-
-  // Uncomment to make actual API call
-  // try {
-  //   return await api.get('/api/doctors');
-  // } catch (error) {
-  //   throw new Error(error?.response?.data?.message || error.message);
-  // }
+export const getDoctors = async () => {
+  try {
+    const response = await api.get('/api/auth/doctors');
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching doctors:', error);
+    throw new Error(error?.response?.data?.message || error.message);
+  }
 };
 
 // Description: Get doctor profile details
