@@ -76,3 +76,25 @@ class Appointment(models.Model):
     
     def __str__(self):
         return f"{self.patient.email} - {self.doctor.fam_dr_name}"
+
+class Message(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return f"{self.sender.email} to {self.receiver.email}"
+
+class Report(models.Model):
+    patient = models.ForeignKey(User, on_delete=models.CASCADE)
+    prediction = models.ForeignKey(Prediction, on_delete=models.CASCADE)
+    patient_name = models.CharField(max_length=100)
+    patient_age = models.IntegerField()
+    patient_gender = models.CharField(max_length=10)
+    pdf_url = models.CharField(max_length=200)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"Report for {self.patient_name}"

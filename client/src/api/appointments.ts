@@ -4,55 +4,30 @@ import api from './api';
 // Endpoint: GET /api/appointments
 // Request: {}
 // Response: { appointments: Array<{ _id: string, doctorId: string, doctorName: string, doctorAvatar: string, date: string, time: string, status: string, disease: string, confidence: number }> }
-export const getAppointments = () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        appointments: [
-          {
-            _id: 'apt_1',
-            doctorId: 'doc_1',
-            doctorName: 'Dr. Sarah Johnson',
-            doctorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
-            date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            time: '10:00 AM',
-            status: 'confirmed',
-            disease: 'Melanoma',
-            confidence: 87
-          },
-          {
-            _id: 'apt_2',
-            doctorId: 'doc_2',
-            doctorName: 'Dr. Michael Chen',
-            doctorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michael',
-            date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            time: '2:30 PM',
-            status: 'pending',
-            disease: 'Psoriasis',
-            confidence: 72
-          },
-          {
-            _id: 'apt_3',
-            doctorId: 'doc_1',
-            doctorName: 'Dr. Sarah Johnson',
-            doctorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
-            date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            time: '11:00 AM',
-            status: 'completed',
-            disease: 'Eczema',
-            confidence: 65
-          }
-        ]
-      });
-    }, 500);
-  });
+export const getAppointments = async () => {
+  try {
+    const response = await api.get('/api/auth/appointments');
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching appointments:', error);
+    throw new Error(error?.response?.data?.message || error.message);
+  }
+};
 
-  // Uncomment to make actual API call
-  // try {
-  //   return await api.get('/api/appointments');
-  // } catch (error) {
-  //   throw new Error(error?.response?.data?.message || error.message);
-  // }
+export const requestAppointment = async (data: {
+  doctorId: string;
+  reportId: string;
+  message?: string;
+  preferredDate?: string;
+  preferredTime?: string;
+}) => {
+  try {
+    const response = await api.post('/api/auth/appointments/request', data);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error requesting appointment:', error);
+    throw new Error(error?.response?.data?.message || error.message);
+  }
 };
 
 // Description: Cancel an appointment
