@@ -67,3 +67,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_ALL_ORIGINS = True
 APPEND_SLASH = False
 AUTH_USER_MODEL = 'authentication.User'
+
+# Configure DRF to use the project's simple JWT authentication so
+# Authorization: Bearer <token> headers issued by the frontend will
+# populate request.user in our function-based views.
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'authentication.authentication.SimpleJWTAuthentication',
+    ),
+}

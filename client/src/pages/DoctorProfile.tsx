@@ -14,6 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Star, Loader2, Calendar } from 'lucide-react';
 import { getDoctorById, requestAppointment } from '@/api/doctors';
+import { ToastAction } from '@/components/ui/toast';
 import { getReports } from '@/api/reports';
 import { useToast } from '@/hooks/useToast';
 
@@ -107,9 +108,25 @@ export function DoctorProfile() {
       form.reset();
       navigate('/appointments');
     } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Failed to request appointment';
+      // If server asks user to complete patient profile, show a toast with an action to navigate to profile
+      if (typeof msg === 'string' && msg.toLowerCase().includes('patient profile')) {
+        toast({
+          title: 'Complete Profile',
+          description: 'Please complete your patient profile before requesting an appointment',
+          variant: 'destructive',
+          action: (
+            <ToastAction asChild>
+              <Button onClick={() => navigate('/profile')}>Complete Profile</Button>
+            </ToastAction>
+          )
+        });
+        return;
+      }
+
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to request appointment',
+        description: msg,
         variant: 'destructive'
       });
     } finally {

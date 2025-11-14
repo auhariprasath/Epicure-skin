@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { login as apiLogin, register as apiRegister, getAuthConfig } from "../api/auth";
+import { getPatientProfile } from "../api/patient";
 import { User } from "@shared/types/user";
 
 type AuthStrategy = 'email' | 'oauth';
@@ -86,6 +87,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await apiLogin(email, password);
       const { accessToken, refreshToken, ...userData } = response;
       setAuthData(accessToken, refreshToken, userData);
+      // Try to fetch the patient's profile and merge into userData for UI
+      try {
+        const profile = await getPatientProfile();
+        const merged = { ...userData, profile } as User;
+        localStorage.setItem('userData', JSON.stringify(merged));
+        setUser(merged);
+      } catch (err) {
+        // It's okay if profile doesn't exist yet; UI can prompt the user to create one
+      }
     } catch (error) {
       resetAuth();
       throw new Error(error?.message || 'Login failed');
@@ -97,6 +107,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await apiRegister(email, password, role);
       const { accessToken, refreshToken, ...userData } = response;
       setAuthData(accessToken, refreshToken, userData);
+      // After registering, attempt to fetch any existing profile and attach it
+      try {
+        const profile = await getPatientProfile();
+        const merged = { ...userData, profile } as User;
+        localStorage.setItem('userData', JSON.stringify(merged));
+        setUser(merged);
+      } catch (err) {
+        // ignore - newly registered users won't have a profile yet
+      }
     } catch (error) {
       resetAuth();
       throw new Error(error?.message || 'Registration failed');

@@ -20,6 +20,7 @@ import { Forum } from "./pages/Forum"
 import { ForumTopic } from "./pages/ForumTopic"
 import { ForumCreate } from "./pages/ForumCreate"
 import { DoctorDashboard } from "./pages/DoctorDashboard"
+import { Profile } from "./pages/Profile"
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
             <Route path="reports" element={<Reports />} />
             <Route path="doctors" element={<Doctors />} />
             <Route path="doctor/:doctorId" element={<DoctorProfile />} />
+            <Route path="profile" element={<Profile />} />
             <Route path="appointments" element={<Appointments />} />
             <Route path="messages" element={<Messages />} />
           </Route>
