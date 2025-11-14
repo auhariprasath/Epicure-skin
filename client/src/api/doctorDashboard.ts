@@ -1,161 +1,90 @@
 import api from './api';
 
 // Description: Get doctor dashboard stats
-// Endpoint: GET /api/doctor/dashboard/stats
+// Endpoint: GET /api/auth/appointments (computed from appointments)
 // Request: {}
 // Response: { totalPatients: number, pendingAppointments: number, unreadMessages: number, completedAppointments: number }
-export const getDoctorStats = () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        totalPatients: 47,
-        pendingAppointments: 5,
-        unreadMessages: 3,
-        completedAppointments: 142
-      });
-    }, 500);
-  });
-
-  // Uncomment to make actual API call
-  // try {
-  //   return await api.get('/api/doctor/dashboard/stats');
-  // } catch (error) {
-  //   throw new Error(error?.response?.data?.message || error.message);
-  // }
+export const getDoctorStats = async () => {
+  try {
+    const response = await api.get('/api/auth/appointments');
+    const appointments = response.data.appointments || [];
+    const pendingCount = appointments.filter((apt: any) => apt.status === 'pending').length;
+    const completedCount = appointments.filter((apt: any) => apt.status === 'completed').length;
+    // Get unique patients
+    const uniquePatients = new Set(appointments.map((apt: any) => apt.patientName)).size;
+    
+    return {
+      totalPatients: uniquePatients,
+      pendingAppointments: pendingCount,
+      unreadMessages: 0,
+      completedAppointments: completedCount
+    };
+  } catch (error: any) {
+    console.error('Error fetching doctor stats:', error);
+    throw new Error(error?.response?.data?.message || error.message);
+  }
 };
 
 // Description: Get doctor appointments
-// Endpoint: GET /api/doctor/appointments
+// Endpoint: GET /api/auth/appointments
 // Request: {}
-// Response: { appointments: Array<{ _id: string, patientName: string, patientAge: number, patientGender: string, date: string, time: string, status: string, disease: string, confidence: number, imageUrl: string }> }
-export const getDoctorAppointments = () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        appointments: [
-          {
-            _id: 'apt_1',
-            patientName: 'John Doe',
-            patientAge: 35,
-            patientGender: 'Male',
-            date: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            time: '10:00 AM',
-            status: 'pending',
-            disease: 'Melanoma',
-            confidence: 87,
-            imageUrl: 'https://api.dicebear.com/7.x/shapes/svg?seed=skin1'
-          },
-          {
-            _id: 'apt_2',
-            patientName: 'Jane Smith',
-            patientAge: 28,
-            patientGender: 'Female',
-            date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            time: '2:30 PM',
-            status: 'confirmed',
-            disease: 'Psoriasis',
-            confidence: 72,
-            imageUrl: 'https://api.dicebear.com/7.x/shapes/svg?seed=skin2'
-          },
-          {
-            _id: 'apt_3',
-            patientName: 'Mike Johnson',
-            patientAge: 42,
-            patientGender: 'Male',
-            date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            time: '11:00 AM',
-            status: 'pending',
-            disease: 'Eczema',
-            confidence: 65,
-            imageUrl: 'https://api.dicebear.com/7.x/shapes/svg?seed=skin3'
-          }
-        ]
-      });
-    }, 500);
-  });
-
-  // Uncomment to make actual API call
-  // try {
-  //   return await api.get('/api/doctor/appointments');
-  // } catch (error) {
-  //   throw new Error(error?.response?.data?.message || error.message);
-  // }
+// Response: { appointments: Array<...> }
+export const getDoctorAppointments = async () => {
+  try {
+    const response = await api.get('/api/auth/appointments');
+    console.debug('getDoctorAppointments response:', response);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching doctor appointments:', error);
+    throw new Error(error?.response?.data?.message || error.message);
+  }
 };
 
 // Description: Confirm an appointment
-// Endpoint: POST /api/doctor/appointments/:id/confirm
-// Request: {}
-// Response: { success: boolean, message: string }
-export const confirmAppointment = (appointmentId: string) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({ success: true, message: 'Appointment confirmed successfully' });
-    }, 500);
-  });
-
-  // Uncomment to make actual API call
-  // try {
-  //   return await api.post(`/api/doctor/appointments/${appointmentId}/confirm`);
-  // } catch (error) {
-  //   throw new Error(error?.response?.data?.message || error.message);
-  // }
+// Endpoint: POST /api/auth/appointments/:id/confirm
+export const confirmAppointment = async (appointmentId: string) => {
+  try {
+    const response = await api.post(`/api/auth/appointments/${appointmentId}/confirm`, {});
+    return response.data;
+  } catch (error: any) {
+    console.error('Error confirming appointment:', error);
+    throw new Error(error?.response?.data?.message || error.message);
+  }
 };
 
 // Description: Decline an appointment
-// Endpoint: POST /api/doctor/appointments/:id/decline
-// Request: { reason: string }
-// Response: { success: boolean, message: string }
-export const declineAppointment = (appointmentId: string, reason: string) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({ success: true, message: 'Appointment declined successfully' });
-    }, 500);
-  });
-
-  // Uncomment to make actual API call
-  // try {
-  //   return await api.post(`/api/doctor/appointments/${appointmentId}/decline`, { reason });
-  // } catch (error) {
-  //   throw new Error(error?.response?.data?.message || error.message);
-  // }
+// Endpoint: DELETE /api/auth/appointments/:id/cancel
+export const declineAppointment = async (appointmentId: string, reason: string) => {
+  try {
+    const response = await api.delete(`/api/auth/appointments/${appointmentId}/cancel`, {
+      data: { reason }
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error('Error declining appointment:', error);
+    throw new Error(error?.response?.data?.message || error.message);
+  }
 };
 
 // Description: Get doctor patient reports
-// Endpoint: GET /api/doctor/reports
-// Request: {}
-// Response: { reports: Array<{ _id: string, patientName: string, disease: string, confidence: number, timestamp: string, status: string, imageUrl: string }> }
-export const getDoctorReports = () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        reports: [
-          {
-            _id: 'report_1',
-            patientName: 'John Doe',
-            disease: 'Melanoma',
-            confidence: 87,
-            timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-            status: 'reviewed',
-            imageUrl: 'https://api.dicebear.com/7.x/shapes/svg?seed=report1'
-          },
-          {
-            _id: 'report_2',
-            patientName: 'Jane Smith',
-            disease: 'Psoriasis',
-            confidence: 72,
-            timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-            status: 'pending',
-            imageUrl: 'https://api.dicebear.com/7.x/shapes/svg?seed=report2'
-          }
-        ]
-      });
-    }, 500);
-  });
-
-  // Uncomment to make actual API call
-  // try {
-  //   return await api.get('/api/doctor/reports');
-  // } catch (error) {
-  //   throw new Error(error?.response?.data?.message || error.message);
-  // }
+// Endpoint: GET /api/auth/appointments (mock reports from appointments for now)
+export const getDoctorReports = async () => {
+  try {
+    const response = await api.get('/api/auth/appointments');
+    // Convert appointments to report format (mock data)
+    const appointments = response.data.appointments || [];
+    const reports = appointments.map((apt: any) => ({
+      _id: `report_${apt._id}`,
+      patientName: apt.patientName,
+      disease: apt.disease,
+      confidence: apt.confidence,
+      timestamp: apt.date,
+      status: apt.status === 'completed' ? 'reviewed' : 'pending',
+      imageUrl: apt.imageUrl || ''
+    }));
+    return { reports };
+  } catch (error: any) {
+    console.error('Error fetching doctor reports:', error);
+    throw new Error(error?.response?.data?.message || error.message);
+  }
 };

@@ -4,14 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertCircle, Calendar, Clock, User, Loader2, X } from 'lucide-react';
-import { getAppointments, cancelAppointment } from '@/api/appointments';
+import { AlertCircle, Calendar, Clock, User, Loader2, X, Check } from 'lucide-react';
+import { getAppointments, cancelAppointment, confirmAppointment, updateAppointmentStatus } from '@/api/appointments';
 import { useToast } from '@/hooks/useToast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Appointment {
   _id: string;
   doctorId: string;
   doctorName: string;
+  patientName?: string;
+  patientEmail?: string;
   doctorAvatar: string;
   date: string;
   time: string;
@@ -22,9 +25,12 @@ interface Appointment {
 
 export function Appointments() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [canceling, setCanceling] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState<string | null>(null);
+  const isDoctor = user?.role === 'doctor';
 
   useEffect(() => {
     const loadAppointments = async () => {
@@ -50,7 +56,7 @@ export function Appointments() {
     try {
       setCanceling(appointmentId);
       await cancelAppointment(appointmentId);
-      setAppointments(appointments.filter(a => a._id !== appointmentId));
+      setAppointments(appointments.map(a => a._id === appointmentId ? { ...a, status: 'cancelled' } : a));
       toast({
         title: 'Success',
         description: 'Appointment cancelled successfully'
@@ -63,6 +69,26 @@ export function Appointments() {
       });
     } finally {
       setCanceling(null);
+    }
+  };
+
+  const handleConfirm = async (appointmentId: string) => {
+    try {
+      setConfirming(appointmentId);
+      await confirmAppointment(appointmentId);
+      setAppointments(appointments.map(a => a._id === appointmentId ? { ...a, status: 'confirmed' } : a));
+      toast({
+        title: 'Success',
+        description: 'Appointment confirmed successfully'
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to confirm appointment',
+        variant: 'destructive'
+      });
+    } finally {
+      setConfirming(null);
     }
   };
 
@@ -117,7 +143,7 @@ export function Appointments() {
             </div>
           </div>
 
-          {appointment.status === 'pending' && (
+          {appointment.status === 'pending' && !isDoctor && (
             <Button
               onClick={() => handleCancel(appointment._id)}
               disabled={canceling === appointment._id}
@@ -137,6 +163,54 @@ export function Appointments() {
                 </>
               )}
             </Button>
+          )}
+
+          {appointment.status === 'pending' && isDoctor && (
+            <div className="flex gap-2">
+              <Button
+                onClick={() => handleConfirm(appointment._id)}
+                disabled={confirming === appointment._id}
+                className="flex-1 bg-green-600 hover:bg-green-700"
+                size="sm"
+              >
+                {confirming === appointment._id ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Confirming...
+                  </>
+                ) : (
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    Confirm
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={() => handleCancel(appointment._id)}
+                disabled={canceling === appointment._id}
+                variant="destructive"
+                size="sm"
+                className="flex-1"
+              >
+                {canceling === appointment._id ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Declining...
+                  </>
+                ) : (
+                  <>
+                    <X className="mr-2 h-4 w-4" />
+                    Decline
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+
+          {appointment.status === 'pending' && (
+            <div className="text-xs text-muted-foreground bg-yellow-50 p-2 rounded">
+              {isDoctor ? `Patient: ${appointment.patientName}` : 'Waiting for doctor to respond...'}
+            </div>
           )}
         </div>
       </CardContent>

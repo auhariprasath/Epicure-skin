@@ -13,6 +13,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Loader2, ArrowLeft } from 'lucide-react';
 import { createForumTopic } from '@/api/forum';
 import { useToast } from '@/hooks/useToast';
+import { useAuth } from '@/contexts/AuthContext';
 
 const topicSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters'),
@@ -32,6 +33,9 @@ const CATEGORIES = [
 export function ForumCreate() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
+  const isDoctor = user?.role === 'doctor';
+  const baseUrl = isDoctor ? '/doctor' : '';
   const [loading, setLoading] = useState(false);
 
   const form = useForm<TopicFormData>({
@@ -48,7 +52,7 @@ export function ForumCreate() {
         description: 'Topic created successfully'
       });
 
-      navigate('/forum');
+      navigate(`${baseUrl}/forum`);
     } catch (error) {
       toast({
         title: 'Error',
@@ -63,7 +67,7 @@ export function ForumCreate() {
   return (
     <div className="max-w-2xl mx-auto space-y-6 pb-20">
       <Button
-        onClick={() => navigate('/forum')}
+        onClick={() => navigate(`${baseUrl}/forum`)}
         variant="outline"
         size="sm"
       >
@@ -160,7 +164,7 @@ export function ForumCreate() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate('/forum')}
+              onClick={() => navigate(`${baseUrl}/forum`)}
               className="flex-1"
             >
               Cancel

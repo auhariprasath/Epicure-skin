@@ -42,6 +42,9 @@ export function Header() {
         <div className="hidden md:flex items-center gap-4">
           {isPatient && (
             <>
+              <Button variant="ghost" size="sm" onClick={() => navigate("/profile")}>
+                Profile
+              </Button>
               <Button variant="ghost" size="sm" onClick={() => navigate("/prediction")}>
                 Prediction
               </Button>
@@ -89,6 +92,7 @@ export function Header() {
             <DropdownMenuContent align="end" className="w-56">
               {isPatient && (
                 <>
+                    <DropdownMenuItem onClick={() => handleNavigation("/profile")}>Profile</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleNavigation("/prediction")}>
                     Prediction
                   </DropdownMenuItem>

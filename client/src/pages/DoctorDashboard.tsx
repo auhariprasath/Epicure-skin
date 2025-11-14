@@ -21,6 +21,8 @@ interface Appointment {
   patientName: string;
   patientAge: number;
   patientGender: string;
+  doctorName: string;
+  doctorId: string;
   date: string;
   time: string;
   status: string;
@@ -214,7 +216,11 @@ export function DoctorDashboard() {
                   {pendingAppointments.map(apt => (
                     <Card key={apt._id}>
                       <CardContent className="pt-6">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                          <div>
+                            <p className="text-sm text-muted-foreground">Doctor</p>
+                            <p className="font-semibold">{apt.doctorName}</p>
+                          </div>
                           <div>
                             <p className="text-sm text-muted-foreground">Patient</p>
                             <p className="font-semibold">{apt.patientName}</p>
@@ -277,7 +283,11 @@ export function DoctorDashboard() {
                   {confirmedAppointments.map(apt => (
                     <Card key={apt._id}>
                       <CardContent className="pt-6">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                          <div>
+                            <p className="text-sm text-muted-foreground">Doctor</p>
+                            <p className="font-semibold">{apt.doctorName}</p>
+                          </div>
                           <div>
                             <p className="text-sm text-muted-foreground">Patient</p>
                             <p className="font-semibold">{apt.patientName}</p>

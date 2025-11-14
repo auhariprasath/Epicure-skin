@@ -96,6 +96,14 @@ export function PatientDashboard() {
           <span>New Prediction</span>
         </Button>
         <Button
+          onClick={() => navigate('/profile')}
+          variant="outline"
+          className="h-24 flex flex-col items-center justify-center gap-2"
+        >
+          <FileText className="h-6 w-6" />
+          <span>Profile</span>
+        </Button>
+        <Button
           onClick={() => navigate('/reports')}
           variant="outline"
           className="h-24 flex flex-col items-center justify-center gap-2"

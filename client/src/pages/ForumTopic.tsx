@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, ThumbsUp, Loader2, ArrowLeft } from 'lucide-react';
 import { getForumTopic, replyToTopic } from '@/api/forum';
 import { useToast } from '@/hooks/useToast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Reply {
   _id: string;
@@ -36,6 +37,9 @@ export function ForumTopic() {
   const { topicId } = useParams<{ topicId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
+  const isDoctor = user?.role === 'doctor';
+  const baseUrl = isDoctor ? '/doctor' : '';
   const [topic, setTopic] = useState<TopicData | null>(null);
   const [loading, setLoading] = useState(true);
   const [replying, setReplying] = useState(false);
@@ -119,7 +123,7 @@ export function ForumTopic() {
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-20">
       <Button
-        onClick={() => navigate('/forum')}
+        onClick={() => navigate(`${baseUrl}/forum`)}
         variant="outline"
         size="sm"
       >
@@ -220,7 +224,7 @@ export function ForumTopic() {
           />
           <div className="flex gap-3">
             <Button
-              onClick={() => navigate('/forum')}
+              onClick={() => navigate(`${baseUrl}/forum`)}
               variant="outline"
               className="flex-1"
             >

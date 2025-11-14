@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Search, Plus, MessageCircle, ThumbsUp, Loader2 } from 'lucide-react';
 import { getForumTopics } from '@/api/forum';
 import { useToast } from '@/hooks/useToast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Topic {
   _id: string;
@@ -31,6 +32,9 @@ const CATEGORIES = [
 export function Forum() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
+  const isDoctor = user?.role === 'doctor';
+  const baseUrl = isDoctor ? '/doctor' : '';
   const [topics, setTopics] = useState<Topic[]>([]);
   const [filteredTopics, setFilteredTopics] = useState<Topic[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,7 +92,7 @@ export function Forum() {
           </p>
         </div>
         <Button
-          onClick={() => navigate('/forum/create')}
+          onClick={() => navigate(`${baseUrl}/forum/create`)}
           className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
         >
           <Plus className="mr-2 h-4 w-4" />
@@ -165,7 +169,7 @@ export function Forum() {
             <Card
               key={topic._id}
               className="cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => navigate(`/forum/topic/${topic._id}`)}
+              onClick={() => navigate(`${baseUrl}/forum/topic/${topic._id}`)}
             >
               <CardContent className="pt-6">
                 <div className="flex gap-4">
